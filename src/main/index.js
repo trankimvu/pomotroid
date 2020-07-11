@@ -1,10 +1,10 @@
 'use strict'
 
+import { logger } from './../renderer/utils/logger'
 import { createLocalStore } from './../renderer/utils/LocalStore'
 import { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } from 'electron'
 
 const path = require('path')
-
 const localStore = createLocalStore()
 
 /**
@@ -24,6 +24,7 @@ const winURL =
     : `file://${__dirname}/index.html`
 
 app.on('ready', () => {
+  logger.info('app ready')
   createWindow()
   const minToTray = localStore.get('minToTray')
   const alwaysOnTop = localStore.get('alwaysOnTop')
@@ -37,6 +38,7 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
+  logger.info('quitting app...')
   if (process.platform !== 'darwin') {
     app.quit()
   }
@@ -96,7 +98,10 @@ function createWindow() {
     backgroundColor: '#2F384B',
     fullscreenable: false,
     frame: false,
-    icon: path.join(__static, 'icon.png'),
+    icon:
+      process.platform === 'darwin'
+        ? path.join(__static, 'icon--macos.png')
+        : path.join(__static, 'icon.png'),
     resizable: false,
     useContentSize: true,
     width: 360,
